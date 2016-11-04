@@ -5,8 +5,30 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/dmvc');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+    // we're connected!
+    console.log('DB connected');
+});
+var usersSchema = mongoose.Schema({
+    login: String,
+    pwd: String
+});
+/*var tasksSchema = mongoose.Schema({
+    userID: String,
+    task: String,
+    done: Boolean
+});
+var Task = mongoose.model('Tasks', tasksSchema);*/
+var User = mongoose.model('Users', usersSchema);
 
 var dMVC = require('dmvc');
+dMVC.init(mongoose);
 
 //SOCKETS
 /*var io = require('socket.io').listen(3333);
@@ -44,8 +66,86 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(session({
+    secret: 'some secret',
+    cookie: {}
+}));
+
 app.use('/', routes);
 app.use('/users', users);
+
+app.get('/get_views', function(req, res, next) {
+    var views = dMVC.getViews();
+    console.log('views: ', views);
+    res.json(views);
+});
+
+app.get('/register', function(req, res, next) {
+    res.render('register', { title: 'Express' });
+});
+
+app.post('/register', function(req, res, next) {
+    var user = new User({
+        login: req.body.login,
+        pwd: req.body.pwd
+    });
+    user.save(function (err, user) {
+        if (err) {
+            res.redirect('/register');
+            //return console.error(err);
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+app.post('/', function(req, res, next) {
+    User.find({login: req.body.login, pwd: req.body.pwd}, function (err, users) {
+        if (err) return console.error(err);
+        if(users.length == 1) {
+            req.session.userID = users[0]._id;
+            res.redirect('/app');
+        } else {
+            res.redirect('/');
+        }
+        //res.json(users);
+        //console.log(kittens);
+    });
+
+});
+
+app.get('/app', function(req, res, next) {
+    if(req.session.userID) {
+        //res.json({userID: req.session.userID});
+        res.render('app', { title: 'Express' });
+    } else {
+        res.redirect('/');
+    }
+});
+
+app.post('/add_task', function(req, res, next) {
+
+    dMVC.Controller.addModel(req, res, next);
+
+    /*var task = dMVC.Controller.addModel({
+        userID: req.session.userID,
+        task: req.body.task
+    });*/
+
+    /*var task = new Task({
+        userID: req.session.userID,
+        task: req.body.task,
+        done: false
+    });
+    task.save(function (err, task) {
+        if (err) {
+            res.json({error: err});
+        } else {
+            res.json({done: task});
+        }
+    });*/
+
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

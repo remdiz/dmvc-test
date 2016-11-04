@@ -1,20 +1,34 @@
 var dMVC = {};
+dMVC.static = {};
 
-dMVC.View = function(view) {
+dMVC.static.View = function(el) {
 
-    _.each(view, function(val, key) {
-        this[key] = val;
-    }, this);
-
-};
-
-dMVC.View.prototype = {
-
-
+    this.$element = $("#" + el);
 
 };
 
-dMVC.Client = function(url) {
+dMVC.static.View.prototype = {
+
+    markup: '<form action="#" id="app_form"><label>New Task: <input type="text" id="add_task"></label><input type="submit"></form><div id="tasks_block"></div>',
+
+    init: function() {
+
+        this.$element.html(this.markup);
+        $("#app_form").submit(this.sendTask);
+
+    },
+
+    //this = form
+    sendTask: function() {
+        $.post('/add_task', {task: $("#add_task").val()}, function(data) {
+            console.log('received: ', data);
+        }, 'json');
+        return false;
+    }
+
+};
+
+/*dMVC.Client = function(url) {
 
     this.url = url || '/get_views';
     this.views = [];
@@ -38,4 +52,4 @@ dMVC.Client.prototype = {
 
     }
 
-};
+};*/
