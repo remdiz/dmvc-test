@@ -2,7 +2,7 @@ $(function() {
 
     var addTaskView = new dMVC.static.View('task_form');
     addTaskView.init();
-
+    console.log('main view: ', addTaskView);
     /*$("#app_form").submit(function() {
         //console.log(this);
         $.post('/add_task', {task: $("#add_task").val()}, function(data) {
