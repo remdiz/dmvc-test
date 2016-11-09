@@ -1,25 +1,19 @@
 $(function() {
 
-    var addTaskView = new dMVC.static.View('task_form');
-    addTaskView.init();
-    console.log('main view: ', addTaskView);
-    /*$("#app_form").submit(function() {
-        //console.log(this);
-        $.post('/add_task', {task: $("#add_task").val()}, function(data) {
-            console.log('received: ', data);
-        }, 'json');
+
+    var viewsController = new dMVC.ViewController();
+
+    console.log('viewsController: ', viewsController);
+
+    viewsController.fetch();
+
+
+    $("#app_form").submit(function() {
+
+        viewsController.add($("#add_task").val());
+
         return false;
     });
 
-    var client = new dMVC.Client();
-    client.fetchViews();*/
 });
 
-
-
-/*
-var menuView = new dMVC.client.View();
-
-menuView.fetch(function(view) {
-    view.render();
-});*/

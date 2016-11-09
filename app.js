@@ -75,9 +75,7 @@ app.use('/', routes);
 app.use('/users', users);
 
 app.get('/get_views', function(req, res, next) {
-    var views = dMVC.getViews();
-    console.log('views: ', views);
-    res.json(views);
+    dMVC.Controller.getViews(req, res, next);
 });
 
 app.get('/register', function(req, res, next) {
@@ -124,6 +122,7 @@ app.get('/app', function(req, res, next) {
 });
 
 app.post('/del_task', function(req, res, next) {
+    //TODO: stopped here
     res.json({user: req.session.userID, body: req.body.id});
 });
 
