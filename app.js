@@ -78,6 +78,12 @@ app.get('/get_views', function(req, res, next) {
     dMVC.Controller.getViews(req, res, next);
 });
 
+//TODO: /events/click/1234
+app.post('/events', function(req, res, next) {
+
+    res.json({event: req.body.type, targetID: req.body.targetID});
+});
+
 app.get('/register', function(req, res, next) {
     res.render('register', { title: 'Express' });
 });
