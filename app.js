@@ -123,7 +123,8 @@ app.get('/app', function(req, res, next) {
 
 app.post('/del_task', function(req, res, next) {
     //TODO: stopped here
-    res.json({user: req.session.userID, body: req.body.id});
+    dMVC.Controller.removeModel(req, res, next);
+    //res.json({user: req.session.userID, body: req.body.id});
 });
 
 app.post('/add_task', function(req, res, next) {

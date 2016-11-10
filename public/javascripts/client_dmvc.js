@@ -4,12 +4,10 @@
 
     dMVC = this.dMVC = {};
 
-    /*dMVC.static = {};
-    dMVC.dynamic = {};*/
-
-    dMVC.View = function(model) {
+    dMVC.View = function(model, ctrl) {
 
         _.extend(this, model);
+        this.controller = ctrl;
 
     };
 
@@ -19,17 +17,15 @@
 
         render: function ($container) {
             var $link = $('<span> X</span>');
-            $link.click({self: this}, this.deleteTask);
-            $container.append($(this.markup).html(this.task).append($link));
+            $link.click({self: this.controller, view: this}, this.controller.remove);
+            this.$element = $(this.markup).html(this.task).append($link);
+            $container.append(this.$element);
         },
 
-        //this!
-        deleteTask: function (evt) {
+        remove: function () {
 
-            var self = evt.data.self;
-            $.post('/del_task', {id: self.id}, function(resp) {
-                console.log('Del task resp: ', resp);
-            }, 'json');
+            this.$element.remove();
+
         }
 
     };
@@ -38,11 +34,23 @@
 
     dMVC.ViewController = function() {
 
-        this.views = [];
+        this.views = [];    //TODO: use some type of Collection??
 
     };
 
     dMVC.ViewController.prototype = {
+
+        remove: function(evt) {
+            var self = evt.data.self,
+                view = evt.data.view;
+            $.post('/del_task', {id: view.id}, function(resp) {
+                console.log('Del task resp: ', resp);
+                if(resp.removed) {
+                    self.views = _.without(self.views, view);
+                    view.remove();
+                }
+            }, 'json');
+        },
 
         add: function (view) {
 
@@ -50,7 +58,7 @@
 
             $.post('/add_task', {task: view}, function(data) {
                 console.log('received: ', data);
-                var added = new dMVC.View(data.model);
+                var added = new dMVC.View(data.model, self);
                 added.render($("#tasks_block"));
                 self.views.push(added);
             }, 'json');
@@ -64,7 +72,7 @@
                 console.log('data: ', data);
                 _.each(data.models, function(view) {
                     //console.log('Each: ', view);
-                    var added = new dMVC.View(view);
+                    var added = new dMVC.View(view, self);
                     added.render($("#tasks_block"));
                     this.views.push(added);
                 }, self);

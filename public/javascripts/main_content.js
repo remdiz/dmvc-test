@@ -1,6 +1,9 @@
 $(function() {
 
 
+
+
+    /*----------------------app-----------------*/
     var viewsController = new dMVC.ViewController();
 
     console.log('viewsController: ', viewsController);
