@@ -81,7 +81,40 @@ app.get('/get_views', function(req, res, next) {
 //TODO: /events/click/1234
 app.post('/events', function(req, res, next) {
 
-    res.json({event: req.body.type, targetID: req.body.targetID});
+    //console.log('/events: ', req.body.evtType, req.body.evtObject, JSON.parse(req.body.evtObject));
+    if(req.body.evtType == 'submit') {
+        dMVC.Controller.addModel(req, res, next);
+    } else if(req.body.evtType == 'click') {
+        req.body.evtObject = JSON.parse(req.body.evtObject);
+        dMVC.Controller.removeModel(req, res, next);
+    }
+
+
+    //res.json({body: req.body});
+
+    /*res.json([
+        {
+            name: 'append',
+            target: '#tasks_block',
+            content: {
+                name: 'create',
+                content: '<li>' + req.body.task + '</li>',
+                insert: [
+                    {
+                        name: 'create',
+                        content: '<span id="1"> X</span>',
+                        events: [
+                            {
+                                name: 'click',
+                                url: '/del_task',
+                                lookFor: 'id'
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]);*/
 });
 
 app.get('/register', function(req, res, next) {

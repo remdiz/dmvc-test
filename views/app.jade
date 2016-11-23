@@ -12,8 +12,8 @@ block content
     h1= title
     p Welcome to #{title}
 
-    form#app_form(action="#")
+    form.on_submit(action="#")
         label New Task:
-            input#add_task(type="text")
+            input#add_task(type="text", name="task")
         input(type="submit")
         ul#tasks_block
