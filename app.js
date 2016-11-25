@@ -7,6 +7,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 
+var MemoryStore = session.MemoryStore;      //TODO: dev-app storage only!
+var sessionStorage = new MemoryStore();     //to get user ID from session in websockets
+var COOKIE_SECRET = 'some secret';
+
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/dmvc');
 var db = mongoose.connection;
@@ -19,35 +23,76 @@ var usersSchema = mongoose.Schema({
     login: String,
     pwd: String
 });
-/*var tasksSchema = mongoose.Schema({
-    userID: String,
-    task: String,
-    done: Boolean
-});
-var Task = mongoose.model('Tasks', tasksSchema);*/
+
 var User = mongoose.model('Users', usersSchema);
 
 var dMVC = require('dmvc');
 dMVC.init(mongoose);
 
 //SOCKETS
-/*var io = require('socket.io').listen(3333);
+var io = require('socket.io').listen(3333);
+/*io.set('authorization', function (data, accept) {
+
+    // check if there's a cookie header
+    if (data.headers.cookie) {
+
+        var parser = cookieParser(COOKIE_SECRET);
+        parser(data, null, function(){});
+
+        sessionStorage.get(data.signedCookies['connect.sid'], function(err, session) {
+            // session
+            console.log('Session: ', session.userID);
+        });
+
+    } else {
+        // if there isn't, turn down the connection with a message
+        // and leave the function.
+        return accept('No cookie transmitted.', false);
+    }
+    // accept the incoming connection
+    accept(null, true);
+});*/
 io.sockets.on('connection', function (socket) {
 
-    // Посылаем клиенту сообщение о том, что он успешно подключился и его имя
-    socket.json.send({'event': 'connected', 'someData': 'test'});
-    // Навешиваем обработчик на входящее сообщение
-    socket.on('message', function (msg) {
-        var time = (new Date).toLocaleTimeString();
-        // Уведомляем клиента, что его сообщение успешно дошло до сервера
-        socket.json.send({'event': 'messageSent', 'name': ID, 'text': msg, 'time': time});
-    });
-    // При отключении клиента - уведомляем остальных
-    socket.on('disconnect', function() {
+    // Connection establishment confirmation
+    //socket.json.send({'event': 'connected', 'session': socket.upgradeReq});
+    if(socket.handshake.headers.cookie) {
+        var parser = cookieParser(COOKIE_SECRET);
+        parser(socket.handshake, null, function(){
+            sessionStorage.get(socket.handshake.signedCookies['connect.sid'], function(err, session) {
+                // session
+                if(session.userID) {    //TODO: check user ID
+                    var userID = session.userID;
+                    // Input message
+                    socket.on('message', function (msg) {
+
+                        socket.json.send({'event': 'message echo', 'message': msg, user: userID});
+                    });
+
+                    // Client disconnection
+                    socket.on('disconnect', function() {
+                        /*var time = (new Date).toLocaleTimeString();
+                         io.sockets.json.send({'event': 'userSplit', 'name': ID, 'time': time});*/
+                    });
+                }
+                //console.log('Session: ', session.userID);
+            });
+        });
+    }
+
+    // Input message
+    /*socket.on('message', function (msg) {
+
+        socket.json.send({'event': 'message echo', 'message': msg});
+    });*/
+
+    // Client disconnection
+    /*socket.on('disconnect', function() {
         var time = (new Date).toLocaleTimeString();
         io.sockets.json.send({'event': 'userSplit', 'name': ID, 'time': time});
-    });
-});*/
+    });*/
+
+});
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -67,14 +112,15 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-    secret: 'some secret',
+    secret: COOKIE_SECRET,
+    store: sessionStorage,
     cookie: {}
 }));
 
 app.use('/', routes);
 app.use('/users', users);
 
-app.get('/get_views', function(req, res, next) {
+app.get('/init', function(req, res, next) {
     dMVC.Controller.getViews(req, res, next);
 });
 
@@ -91,30 +137,6 @@ app.post('/events', function(req, res, next) {
 
 
     //res.json({body: req.body});
-
-    /*res.json([
-        {
-            name: 'append',
-            target: '#tasks_block',
-            content: {
-                name: 'create',
-                content: '<li>' + req.body.task + '</li>',
-                insert: [
-                    {
-                        name: 'create',
-                        content: '<span id="1"> X</span>',
-                        events: [
-                            {
-                                name: 'click',
-                                url: '/del_task',
-                                lookFor: 'id'
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
-    ]);*/
 });
 
 app.get('/register', function(req, res, next) {
@@ -170,23 +192,6 @@ app.post('/add_task', function(req, res, next) {
 
     dMVC.Controller.addModel(req, res, next);
 
-    /*var task = dMVC.Controller.addModel({
-        userID: req.session.userID,
-        task: req.body.task
-    });*/
-
-    /*var task = new Task({
-        userID: req.session.userID,
-        task: req.body.task,
-        done: false
-    });
-    task.save(function (err, task) {
-        if (err) {
-            res.json({error: err});
-        } else {
-            res.json({done: task});
-        }
-    });*/
 
 });
 
