@@ -62,7 +62,7 @@ $(function() {
 
     });
 
-    $.get('/init', commandsResolver);
+    //$.get('/init', commandsResolver);
 
     var jqAdapter = function(selector) {
         this.$el = $(selector);

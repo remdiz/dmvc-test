@@ -27,7 +27,7 @@ var usersSchema = mongoose.Schema({
 var User = mongoose.model('Users', usersSchema);
 
 var dMVC = require('dmvc');
-dMVC.init(mongoose);
+//dMVC.init(mongoose);
 
 //SOCKETS
 var io = require('socket.io').listen(3333);
@@ -61,9 +61,12 @@ io.sockets.on('connection', function (socket) {
         parser(socket.handshake, null, function(){
             sessionStorage.get(socket.handshake.signedCookies['connect.sid'], function(err, session) {
                 // session
-                if(session.userID) {    //TODO: check user ID
-                    var userID = session.userID;
-                    // Input message
+                if(session && session.userID) {    //TODO: check user ID
+                    //var userID = session.userID;
+
+                    dMVC.init(socket, session, mongoose);
+
+                    /*// Input message
                     socket.on('message', function (msg) {
 
                         socket.json.send({'event': 'message echo', 'message': msg, user: userID});
@@ -71,9 +74,9 @@ io.sockets.on('connection', function (socket) {
 
                     // Client disconnection
                     socket.on('disconnect', function() {
-                        /*var time = (new Date).toLocaleTimeString();
-                         io.sockets.json.send({'event': 'userSplit', 'name': ID, 'time': time});*/
-                    });
+                        *//*var time = (new Date).toLocaleTimeString();
+                         io.sockets.json.send({'event': 'userSplit', 'name': ID, 'time': time});*//*
+                    });*/
                 }
                 //console.log('Session: ', session.userID);
             });
