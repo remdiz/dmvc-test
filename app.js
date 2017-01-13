@@ -19,12 +19,7 @@ var usersSchema = mongoose.Schema({
     login: String,
     pwd: String
 });
-/*var tasksSchema = mongoose.Schema({
-    userID: String,
-    task: String,
-    done: Boolean
-});
-var Task = mongoose.model('Tasks', tasksSchema);*/
+
 var User = mongoose.model('Users', usersSchema);
 
 var dMVC = require('dmvc');
@@ -74,12 +69,25 @@ app.use(session({
 app.use('/', routes);
 app.use('/users', users);
 
-app.get('/get_views', function(req, res, next) {
-    dMVC.Controller.getViews(req, res, next);
-});
-
 app.get('/register', function(req, res, next) {
     res.render('register', { title: 'Express' });
+});
+
+app.post('/events', function(req, res, next) {
+    var text = req.body.data;
+    if(req.body.evtType == 'createTask') {
+        res.json({
+            command: 'create',
+            id: 1,
+            text: text
+        });
+    } else if(req.body.evtType == 'deleteTask') {
+        res.json({
+            command: 'delete',
+            id: req.body.emitter
+        });
+    }
+
 });
 
 app.post('/register', function(req, res, next) {
@@ -121,33 +129,7 @@ app.get('/app', function(req, res, next) {
     }
 });
 
-app.post('/del_task', function(req, res, next) {
-    //TODO: stopped here
-    dMVC.Controller.removeModel(req, res, next);
-    //res.json({user: req.session.userID, body: req.body.id});
-});
-
 app.post('/add_task', function(req, res, next) {
-
-    dMVC.Controller.addModel(req, res, next);
-
-    /*var task = dMVC.Controller.addModel({
-        userID: req.session.userID,
-        task: req.body.task
-    });*/
-
-    /*var task = new Task({
-        userID: req.session.userID,
-        task: req.body.task,
-        done: false
-    });
-    task.save(function (err, task) {
-        if (err) {
-            res.json({error: err});
-        } else {
-            res.json({done: task});
-        }
-    });*/
 
 });
 
