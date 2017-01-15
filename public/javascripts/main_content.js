@@ -44,8 +44,10 @@ $(function() {
             // The dummy class constructor
             function Class() {
                 // All construction is actually done in the init method
-                if (!initializing && this.init)
+                if (!initializing && this.init) {
+                    this._preConstruct.apply(this, arguments);
                     this.init.apply(this, arguments);
+                }
             }
 
             // Populate our constructed prototype object
@@ -80,6 +82,21 @@ $(function() {
 
     var View = Object.subClass({
 
+        commands: {},
+
+        //pre-constructor
+        _preConstruct: function (opt) {
+            if(opt.el) {
+                this.$element = $(opt.el);
+            } else {
+                var tag = opt.htmlTag || "div";
+                this.$element = $("<" + tag + "/>");
+            }
+            _.each(this.commands, function (callback, command) {
+                processor.on(command, this[callback], this);
+            }, this);
+        },
+
         //constructor
         init: function(opt) {
             //console.log('View init: ', opt);
@@ -98,18 +115,30 @@ $(function() {
 
     var TaskView = View.subClass({
 
+        commands: {
+            "delete": "deleteTask"
+        },
+
         init: function(opt) {
-            this.$container = $("#tasks_block");
             this.text = opt.text;
             this.id = opt.id;
             this.render();
         },
 
+        deleteTask: function (command) {
+            if(command.id == this.id) {
+                this.stopListening();
+                this.$element.remove();
+            }
+
+            console.log('task view removed');
+        },
+
         render: function() {
             var $link = $('<span> X</span>');
             $link.click({self: this}, this.removeClick);
-            this.$element = $('<li></li>').html(this.text).append($link);
-            this.$container.append(this.$element);
+            this.$element.html(this.text).append($link);
+            $("#tasks_block").append(this.$element);
         },
 
         removeClick: function(evt) {
@@ -121,35 +150,36 @@ $(function() {
 
     var AppView = View.subClass({
 
+        commands: {
+            "create": "createTask"
+        },
+
         //constructor
         init: function(opt) {
-            //console.log('AppView init: ', opt);
-            this.$el = $(opt);
+            //console.log('AppView init: ', arguments.callee);
             this.id = 'app_view';
-            this.$inputField = this.$el.find("#add_task");
-            this.$el.submit({self: this}, this.formSubmit);
-            this.listenTo(processor, 'create', function(evt) {
-                //console.log('appViewEvent: ', evt);
-                var task = new TaskView({id: evt.id, text: evt.text});
-                console.log('task view: ', task);
-            });
+            this.$inputField = this.$element.find("#add_task");
+            this.$element.submit({self: this}, this.formSubmit);
             //вызов родительского метода
             //this._super(opt);
+        },
+
+        createTask: function (command) {
+            //console.log('appViewEvent: ', command);
+            var task = new TaskView({id: command.id, text: command.text, htmlTag: 'li'});
+            console.log('task view: ', task);
         },
 
         formSubmit: function(evt) {
             var self = evt.data.self;
             self.process('createTask', self.$inputField.val());
-            /*$.post(self.url, {data: self.$inputField.val()}, function(resp) {
-                var task = new TaskView({id: resp.id, text: resp.text});
-                console.log('task view: ', task);
-            });*/
             return false;
         }
 
     });
 
-    var app = new AppView('#app_form');
+    //debugger;
+    var app = new AppView({el: '#app_form'});
     console.log('app view: ', app);
     console.log('processor: ', processor);
 
