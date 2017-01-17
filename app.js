@@ -23,7 +23,7 @@ var usersSchema = mongoose.Schema({
 var User = mongoose.model('Users', usersSchema);
 
 var dMVC = require('dmvc');
-dMVC.init(mongoose);
+//dMVC.init(mongoose);
 
 //SOCKETS
 /*var io = require('socket.io').listen(3333);
@@ -68,12 +68,13 @@ app.use(session({
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/events', dMVC);
 
 app.get('/register', function(req, res, next) {
     res.render('register', { title: 'Express' });
 });
 
-app.post('/events', function(req, res, next) {
+/*app.post('/events', function(req, res, next) {
     var text = req.body.data;
     if(req.body.evtType == 'createTask') {
         res.json({
@@ -88,7 +89,7 @@ app.post('/events', function(req, res, next) {
         });
     }
 
-});
+});*/
 
 app.post('/register', function(req, res, next) {
     var user = new User({

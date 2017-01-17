@@ -82,6 +82,8 @@ $(function() {
 
     var View = Object.subClass({
 
+        type: 'view',
+
         commands: {},
 
         //pre-constructor
@@ -104,7 +106,8 @@ $(function() {
 
         process: function(type, data) {
             processor.notify({
-                emitter: this.id,
+                emitter: this.type,
+                modelID: this.modelID,
                 evtType: type,
                 data: data
             });
@@ -114,6 +117,8 @@ $(function() {
     _.extend(View.prototype, Backbone.Events);
 
     var TaskView = View.subClass({
+
+        type: 'Task',
 
         commands: {
             "delete": "deleteTask"
@@ -150,6 +155,8 @@ $(function() {
 
     var AppView = View.subClass({
 
+        type: 'App',
+
         commands: {
             "create": "createTask"
         },
@@ -157,7 +164,6 @@ $(function() {
         //constructor
         init: function(opt) {
             //console.log('AppView init: ', arguments.callee);
-            this.id = 'app_view';
             this.$inputField = this.$element.find("#add_task");
             this.$element.submit({self: this}, this.formSubmit);
             //вызов родительского метода
@@ -166,7 +172,7 @@ $(function() {
 
         createTask: function (command) {
             //console.log('appViewEvent: ', command);
-            var task = new TaskView({id: command.id, text: command.text, htmlTag: 'li'});
+            var task = new TaskView({modelID: command.modelID, text: command.text, htmlTag: 'li'});
             console.log('task view: ', task);
         },
 
