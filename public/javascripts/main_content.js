@@ -72,7 +72,10 @@ $(function() {
             var self = this;
             $.post('/events', opt, function(resp) {
                 console.log('event response: ', resp);
-                self.trigger(resp.command, resp);
+                _.each(resp, function(item) {
+                    self.trigger(item.command, item);
+                });
+
             });
         }
 
@@ -126,12 +129,13 @@ $(function() {
 
         init: function(opt) {
             this.text = opt.text;
-            this.id = opt.id;
+            this.modelID = opt.modelID;
+            this.done = opt.done;
             this.render();
         },
 
         deleteTask: function (command) {
-            if(command.id == this.id) {
+            if(command.id == this.modelID) {
                 this.stopListening();
                 this.$element.remove();
             }
@@ -166,13 +170,19 @@ $(function() {
             //console.log('AppView init: ', arguments.callee);
             this.$inputField = this.$element.find("#add_task");
             this.$element.submit({self: this}, this.formSubmit);
+            this.process('getTasks');
             //вызов родительского метода
             //this._super(opt);
         },
 
         createTask: function (command) {
             //console.log('appViewEvent: ', command);
-            var task = new TaskView({modelID: command.modelID, text: command.text, htmlTag: 'li'});
+            var task = new TaskView({
+                modelID: command.id,
+                text: command.text,
+                done: command.done,
+                htmlTag: 'li'
+            });
             console.log('task view: ', task);
         },
 
