@@ -1,6 +1,6 @@
 $(function() {
 
-    //Реализация наследования
+    //Inheritance implementation (c)J.Resig
     (function() {
         var initializing = false,
             superPattern =  // Determine if functions can be serialized

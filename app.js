@@ -23,7 +23,7 @@ var usersSchema = mongoose.Schema({
 var User = mongoose.model('Users', usersSchema);
 
 var dMVC = require('dmvc');
-dMVC.init(mongoose);
+//dMVC.init(mongoose);
 
 //SOCKETS
 /*var io = require('socket.io').listen(3333);
