@@ -70,7 +70,7 @@ $(function() {
 
         notify: function(opt) {
             var self = this;
-            $.post('/events', opt, function(resp) {
+            $.post('/controllers', opt, function(resp) {
                 console.log('event response: ', resp);
                 _.each(resp, function(item) {
                     self.trigger(item.command, item);
