@@ -8,8 +8,8 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/dmvc');
-var db = mongoose.connection;
+var db = mongoose.createConnection('mongodb://localhost/dmvc');
+//var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     // we're connected!
@@ -20,7 +20,7 @@ var usersSchema = mongoose.Schema({
     pwd: String
 });
 
-var User = mongoose.model('Users', usersSchema);
+var User = db.model('Users', usersSchema);
 
 var dMVC = require('dmvc');
 //dMVC.init(mongoose);
