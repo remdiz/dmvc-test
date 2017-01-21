@@ -22,8 +22,6 @@ var usersSchema = mongoose.Schema({
 
 var User = db.model('Users', usersSchema);
 
-//var dMVC = require('dmvc');
-
 //SOCKETS
 /*var io = require('socket.io').listen(3333);
 io.sockets.on('connection', function (socket) {
@@ -72,7 +70,7 @@ app.use('/users', users);
 app.use('/controllers', controllers);
 
 app.get('/register', function(req, res, next) {
-    res.render('register', { title: 'Express' });
+    res.render('register', { title: 'dMVC Test' });
 });
 
 /*app.post('/events', function(req, res, next) {
@@ -125,7 +123,7 @@ app.post('/', function(req, res, next) {
 app.get('/app', function(req, res, next) {
     if(req.session.userID) {
         //res.json({userID: req.session.userID});
-        res.render('app', { title: 'Express' });
+        res.render('app', { title: 'dMVC Test' });
     } else {
         res.redirect('/');
     }
