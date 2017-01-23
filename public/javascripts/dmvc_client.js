@@ -61,84 +61,95 @@
     };
 })();
 
-/**
- * Client-side events & server commands handler
- * @constructor
- */
-var EventProcessor = function() {
+(function() {
 
-};
-EventProcessor.prototype = {
+    var root = this,
+        dMVC = {};
 
     /**
-     * Send event to back-end via jQuery $.post function
-     * @param opt {Object} to send
+     * Client-side events & server commands handler
+     * @constructor
      */
-    notify: function(opt) {
-        var self = this;
-        $.post('/controllers', opt, function(resp) {
-            _.each(resp, function(item) {
-                self.trigger(item.command, item);
+    var EventProcessor = function() {
+
+    };
+    EventProcessor.prototype = {
+
+        /**
+         * Send event to back-end via jQuery $.post function
+         * @param opt {Object} to send
+         */
+        notify: function(opt) {
+            var self = this;
+            $.post('/controllers', opt, function(resp) {
+                _.each(resp, function(item) {
+                    self.trigger(item.command, item);
+                });
+
             });
-
-        });
-    }
-
-};
-
-/**
- * Using Backbone.Events
- */
-_.extend(EventProcessor.prototype, Backbone.Events);
-var processor = new EventProcessor();
-
-/**
- * Main View class
- */
-var View = Object.subClass({
-
-    /**
-     * we use this field to identify event emitter on back-end
-     */
-    type: 'view',
-
-    /**
-     * command storage
-     * (key-value pairs, key=command name, value=command handler
-     */
-    commands: {},
-
-    //pre-constructor
-    _preConstruct: function (opt) {
-        if(opt.el) {
-            this.$element = $(opt.el);
-        } else {
-            var tag = opt.htmlTag || "div";
-            this.$element = $("<" + tag + "/>");
         }
-        _.each(this.commands, function (callback, command) {
-            processor.on(command, this[callback], this);
-        }, this);
-    },
 
-    //constructor
-    init: function(opt) {
-
-    },
+    };
 
     /**
-     * Send event object to EventProcessor
-     * @param type {String} - event type
-     * @param data {*} - additional event data
+     * Using Backbone.Events
      */
-    process: function(type, data) {
-        processor.notify({
-            emitter: this.type,
-            modelID: this.modelID,
-            evtType: type,
-            data: data
-        });
-    }
+    _.extend(EventProcessor.prototype, Backbone.Events);
+    var processor = new EventProcessor();
 
-});
-_.extend(View.prototype, Backbone.Events);
+    /**
+     * Main View class
+     */
+    dMVC.View = Object.subClass({
+
+        /**
+         * we use this field to identify event emitter on back-end
+         */
+        type: 'view',
+
+        /**
+         * command storage
+         * (key-value pairs, key=command name, value=command handler
+         */
+        commands: {},
+
+        //pre-constructor
+        _preConstruct: function (opt) {
+            if(opt.el) {
+                this.$element = $(opt.el);
+            } else {
+                var tag = opt.htmlTag || "div";
+                this.$element = $("<" + tag + "/>");
+            }
+            _.each(this.commands, function (callback, command) {
+                processor.on(command, this[callback], this);
+            }, this);
+        },
+
+        //constructor
+        init: function(opt) {
+
+        },
+
+        /**
+         * Send event object to EventProcessor
+         * @param type {String} - event type
+         * @param data {*} - additional event data
+         */
+        process: function(type, data) {
+            processor.notify({
+                emitter: this.type,
+                modelID: this.modelID,
+                evtType: type,
+                data: data
+            });
+        }
+
+    });
+    _.extend(dMVC.View.prototype, Backbone.Events);
+
+    root.dMVC = dMVC;
+
+})(this);
+
+

@@ -1,5 +1,5 @@
 $(function () {
-    var TaskView = View.subClass({
+    var TaskView = dMVC.View.subClass({
 
         type: 'Task',
 
@@ -36,7 +36,7 @@ $(function () {
 
     });
 
-    var AppView = View.subClass({
+    var AppView = dMVC.View.subClass({
 
         type: 'App',
 
