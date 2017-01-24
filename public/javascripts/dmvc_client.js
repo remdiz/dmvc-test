@@ -91,6 +91,31 @@
 
     };
 
+    var Composite = {
+
+        add: function(item) {
+
+            this.children[item.cid] = item;
+            this.$element.append(item.$element);
+
+        },
+
+        remove: function(item) {
+
+            if(item) {
+                var id = _.isObject(item) ? item.cid : item;
+
+                this.children[id].remove();
+                delete this.children[id];
+            } else {
+                this.stopListening();
+                this.$element.remove();
+            }
+
+        }
+
+    };
+
     /**
      * Using Backbone.Events
      */
@@ -115,15 +140,49 @@
 
         //pre-constructor
         _preConstruct: function (opt) {
+
+            //this.parents = [];
+            var self = this;
+            this.children = {};
+            this.cid = _.uniqueId('view_');
             if(opt.el) {
                 this.$element = $(opt.el);
             } else {
                 var tag = opt.htmlTag || "div";
                 this.$element = $("<" + tag + "/>");
             }
+            //TODO: refactor to method
+            if(opt.events) {
+                for(var name in opt.events) {
+                    this.$element.on(name, function() {
+                        opt.events[name].apply(opt.context || self, arguments);
+                        return false;
+                    });
+                }
+            }
+
+            if(opt.html) {
+                this.$element.html(opt.html);
+            }
+
+
+            //если создается корневой эл-т без указания el, нужно крепить его к чему-то, это будет container
+            if(opt.container) {
+                $(opt.container).append(this.$element);
+            }
+
+            for(var evtName in this.events) {
+                var callback = this.events[evtName];
+                this.$element.on(evtName, function() {
+                    self[callback].apply(self, arguments);
+                    return false;
+                })
+            }
+
             _.each(this.commands, function (callback, command) {
                 processor.on(command, this[callback], this);
             }, this);
+
         },
 
         //constructor
@@ -139,14 +198,14 @@
         process: function(type, data) {
             processor.notify({
                 emitter: this.type,
-                modelID: this.modelID,
+                cid: this.cid,
                 evtType: type,
                 data: data
             });
         }
 
     });
-    _.extend(dMVC.View.prototype, Backbone.Events);
+    _.extend(dMVC.View.prototype, Backbone.Events, Composite);
 
     root.dMVC = dMVC;
 
