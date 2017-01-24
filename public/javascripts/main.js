@@ -72,6 +72,11 @@ $(function () {
     });
 
     var app = new AppView({el: '#app_form'});
+
+    var list = new dMVC.Basic.List();
+
+
+
     console.log('app view: ', app);
 
 });
