@@ -4,15 +4,23 @@ var dMVC = require('dmvc');
 
 dMVC.TaskModel = dMVC.Model.subClass({
 
-    table: 'Tasks',
+    //table: 'Tasks',
 
-    columns: {
+    /*columns: {
         userID: String,
         task: String,
         done: Boolean
+    },*/
+
+    /**
+     * Initialization method
+     * @param opt {Object}
+     */
+    init: function(opt) {
+        _.extend(this, opt);
     },
 
-    deleteByID: function(id, callback) {
+    /*deleteByID: function(id, callback) {
 
         this._table.remove({_id: id}, callback);
     },
@@ -26,12 +34,39 @@ dMVC.TaskModel = dMVC.Model.subClass({
                 callback(tasks);
             }
         });
+    }*/
+
+});
+
+dMVC.TaskMapper = dMVC.ModelMapper.subClass({
+
+    getByID: function(id) {
+
+        var task = this._dbAdapter.find(id);
+        return this.mapToTask(task);
+
+    },
+
+    mapToTask: function(task) {
+        return new dMVC.TaskModel({
+            id: task._id,
+            task: task,
+            userID: task.userID,
+            done: task.done
+        });
+    },
+
+    saveTask: function(taskModel) {
+
+        this._dbAdapter.save(taskModel);
+
     }
 
 });
 
 dMVC.AppController = dMVC.Controller.subClass({
 
+    //TODO: перенести вызов создания задачи в TaskController
     createTask: function(req, res, next) {
         var taskController = new dMVC.TaskController();
         var task = taskController.newTask(req.body.data, req.session.userID);
@@ -61,7 +96,7 @@ dMVC.AppController = dMVC.Controller.subClass({
 
 dMVC.TaskController = dMVC.Controller.subClass({
 
-    model: 'TaskModel',
+    //model: 'TaskModel',
 
     getAll: function(req, res, next) {
         this.modelInstance.getUserTasks(req.session.userID, function(tasks) {
@@ -83,8 +118,25 @@ dMVC.TaskController = dMVC.Controller.subClass({
     },
 
     newTask: function(text, userID) {
-        var task = {task: text, userID: userID, done: false};
-        return this.modelInstance.create(task);
+        /*var task = {task: text, userID: userID, done: false};
+        return this.modelInstance.create(task);*/
+        var task = new dMVC.TaskModel({
+            task: text,
+            userID: userID,
+            done: false
+        });
+        var taskMapper = new dMVC.TaskMapper({
+            adapter: new dMVC.MongoDBAdapter({
+                connection: 'mongodb://localhost/dmvc',
+                table: 'Tasks',
+                schema: {
+                    userID: String,
+                    task: String,
+                    done: Boolean
+                }
+            })
+        });
+        taskMapper.saveTask(task);
 
     },
 
