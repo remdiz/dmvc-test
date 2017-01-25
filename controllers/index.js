@@ -89,14 +89,14 @@ dMVC.TaskController = dMVC.Controller.subClass({
     },
 
     deleteTask: function(req, res, next) {
-        this.modelInstance.deleteByID(req.body.modelID, function(err) {
+        this.modelInstance.deleteByID(req.body.cid, function(err) {
             if(err) {
                 //TODO: handle error
                 res.json([]);
             } else {
                 res.json([{
                     command: 'delete',
-                    id: req.body.modelID
+                    id: req.body.cid
                 }]);
             }
 
