@@ -4,41 +4,32 @@ var dMVC = require('dmvc');
 
 dMVC.TaskModel = dMVC.Model.subClass({
 
-    //table: 'Tasks',
-
-    /*columns: {
-        userID: String,
-        task: String,
-        done: Boolean
-    },*/
-
     /**
      * Initialization method
      * @param opt {Object}
      */
     init: function(opt) {
         _.extend(this, opt);
-    },
-
-    /*deleteByID: function(id, callback) {
-
-        this._table.remove({_id: id}, callback);
-    },
-
-    getUserTasks: function(userID, callback) {
-
-        this._table.find({userID: userID},function (err, tasks) {
-            if (err) {
-                callback({error: err});
-            } else {
-                callback(tasks);
-            }
-        });
-    }*/
+    }
 
 });
 
 dMVC.TaskMapper = dMVC.ModelMapper.subClass({
+
+    table: 'Tasks',
+    schema: {
+        userID: String,
+        task: String,
+        done: Boolean
+    },
+
+    init: function (opt) {
+        this._dbAdapter.connect({
+            connection: 'mongodb://localhost/dmvc',
+            schemaName: this.table,
+            schema: this.schema
+        });
+    },
 
     getByID: function(id) {
 
@@ -50,39 +41,43 @@ dMVC.TaskMapper = dMVC.ModelMapper.subClass({
     mapToTask: function(task) {
         return new dMVC.TaskModel({
             id: task._id,
-            task: task,
+            task: task.task,
             userID: task.userID,
             done: task.done
         });
     },
 
-    saveTask: function(taskModel) {
+    getUserTasks: function (id, callback) {
+        var self = this;
+        this._dbAdapter.find({userID: id}, function (rows) {
+            if(rows.error) {
+                callback(rows);
+            } else {
+                var tasks = _.map(rows, function (row) {
+                    return self.mapToTask(row);
+                });
+                callback(tasks);
+            }
+        });
+    },
 
-        this._dbAdapter.save(taskModel);
+    saveTask: function(taskModel, callback) {
 
+        this._dbAdapter.save(taskModel, callback);
+
+    },
+
+    deleteTask: function (id, callback) {
+        this._dbAdapter.remove(id, callback);
     }
 
 });
 
 dMVC.AppController = dMVC.Controller.subClass({
 
-    //TODO: перенести вызов создания задачи в TaskController
     createTask: function(req, res, next) {
         var taskController = new dMVC.TaskController();
-        var task = taskController.newTask(req.body.data, req.session.userID);
-        task.save(function(err, record) {
-            if(record.error) {
-                //TODO: handle error
-                res.json([]);
-            } else {
-                res.json([{
-                    command: 'create',
-                    id: record._id,
-                    text: record.task,
-                    done: record.done
-                }]);
-            }
-        });
+        taskController.newTask(req, res, next);
 
     },
 
@@ -96,17 +91,18 @@ dMVC.AppController = dMVC.Controller.subClass({
 
 dMVC.TaskController = dMVC.Controller.subClass({
 
-    //model: 'TaskModel',
-
     getAll: function(req, res, next) {
-        this.modelInstance.getUserTasks(req.session.userID, function(tasks) {
+        var taskMapper = new dMVC.TaskMapper({
+            adapter: new dMVC.MongoDBAdapter()
+        });
+        taskMapper.getUserTasks(req.session.userID, function(tasks) {
             if(tasks.error) {
                 res.json({error: tasks.error});
             } else {
                 var commands = _.map(tasks, function(task) {
                     return {
                         command: 'create',
-                        id: task._id,
+                        id: task.id,
                         text: task.task,
                         done: task.done
                     }
@@ -117,31 +113,39 @@ dMVC.TaskController = dMVC.Controller.subClass({
 
     },
 
-    newTask: function(text, userID) {
-        /*var task = {task: text, userID: userID, done: false};
-        return this.modelInstance.create(task);*/
+    newTask: function(req, res, next) {
+
         var task = new dMVC.TaskModel({
-            task: text,
-            userID: userID,
+            task: req.body.data,
+            userID: req.session.userID,
             done: false
         });
+
         var taskMapper = new dMVC.TaskMapper({
-            adapter: new dMVC.MongoDBAdapter({
-                connection: 'mongodb://localhost/dmvc',
-                table: 'Tasks',
-                schema: {
-                    userID: String,
-                    task: String,
-                    done: Boolean
-                }
-            })
+            adapter: new dMVC.MongoDBAdapter()
         });
-        taskMapper.saveTask(task);
+        taskMapper.saveTask(task, function (err, record) {
+            if(err) {
+                //TODO: handle error
+                res.json([]);
+            } else {
+                //console.log(record);
+                res.json([{
+                    command: 'create',
+                    id: record._id,
+                    text: record.task,
+                    done: record.done
+                }]);
+            }
+        });
 
     },
 
     deleteTask: function(req, res, next) {
-        this.modelInstance.deleteByID(req.body.cid, function(err) {
+        var taskMapper = new dMVC.TaskMapper({
+            adapter: new dMVC.MongoDBAdapter()
+        });
+        taskMapper.deleteTask(req.body.cid, function(err) {
             if(err) {
                 //TODO: handle error
                 res.json([]);
