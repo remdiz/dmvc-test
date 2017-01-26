@@ -1,3 +1,5 @@
+//TODO: error display
+
 //Inheritance implementation (c)J.Resig
 (function() {
     var initializing = false,
