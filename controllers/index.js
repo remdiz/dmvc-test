@@ -4,6 +4,10 @@ var dMVC = require('dmvc');
 
 dMVC.TaskModel = dMVC.Model.subClass({
 
+    validationRules: {
+        task: ['Required', 'String']
+    },
+
     /**
      * Initialization method
      * @param opt {Object}
@@ -63,7 +67,11 @@ dMVC.TaskMapper = dMVC.ModelMapper.subClass({
 
     saveTask: function(taskModel, callback) {
 
-        this._dbAdapter.save(taskModel, callback);
+        if(!taskModel.validate()) {
+            callback({error: 'Validation Error'}, taskModel);
+        } else {
+            this._dbAdapter.save(taskModel, callback);
+        }
 
     },
 
@@ -127,7 +135,7 @@ dMVC.TaskController = dMVC.Controller.subClass({
         taskMapper.saveTask(task, function (err, record) {
             if(err) {
                 //TODO: handle error
-                res.json([]);
+                res.json([{error: err}]);
             } else {
                 //console.log(record);
                 res.json([{

@@ -1,4 +1,5 @@
 //TODO: error display
+//TODO: client-side elements validation
 
 //Inheritance implementation (c)J.Resig
 (function() {
