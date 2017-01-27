@@ -107,6 +107,7 @@ dMVC.TaskController = dMVC.Controller.subClass({
             if(tasks.error) {
                 res.json({error: tasks.error});
             } else {
+                //TODO: implement some kind of command manager
                 var commands = _.map(tasks, function(task) {
                     return {
                         command: 'create',
