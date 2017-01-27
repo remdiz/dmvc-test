@@ -86,6 +86,7 @@ dMVC.getController = function(req) {
     return new dMVC[req.body.emitter + 'Controller'](req);
 };
 
+//TODO: implement adapters in separated module
 dMVC.DbAdapter = Object.subClass({
 
 });
