@@ -1,0 +1,30 @@
+{
+  "name": "dmvc",
+  "version": "1.0.0",
+  "description": "Distributed-MVC Framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "4.0.0",
+    "underscore": "1.0.0",
+    "mongoose": "4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/remdiz/dmvc.git"
+  },
+  "keywords": [
+    "mvc",
+    "javascript",
+    "node",
+    "framework"
+  ],
+  "author": "Vitaly Kotsur",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/remdiz/dmvc/issues"
+  },
+  "homepage": "https://github.com/remdiz/dmvc#readme"
+}
