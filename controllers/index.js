@@ -8,6 +8,14 @@ dMVC.TaskModel = dMVC.Model.subClass({
         task: ['Required', 'String']
     },
 
+    toJSON: function() {
+        return {
+            task: this.task,
+            id: this.id,
+            done: this.done
+        };
+    },
+
     /**
      * Initialization method
      * @param opt {Object}
@@ -70,7 +78,7 @@ dMVC.TaskMapper = dMVC.ModelMapper.subClass({
         if(!taskModel.validate()) {
             callback({error: 'Validation Error'}, taskModel);
         } else {
-            this._dbAdapter.save(taskModel, callback);
+            this._dbAdapter.save(taskModel.toJSON(), callback);
         }
 
     },
