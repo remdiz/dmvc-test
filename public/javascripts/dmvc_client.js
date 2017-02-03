@@ -154,6 +154,11 @@
                 var tag = opt.htmlTag || "div";
                 this.$element = $("<" + tag + "/>");
             }
+
+            this.$element.addClass(opt.class);
+
+            this.$element.attr(opt.attrs || {});
+
             //TODO: refactor to method
             if(opt.events) {
                 for(var name in opt.events) {

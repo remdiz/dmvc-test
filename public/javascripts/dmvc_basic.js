@@ -10,23 +10,21 @@
         DESC_ORDER: 2,
 
         //pre-constructor
-        _preConstruct: function (opt) {
-            opt = opt || {};
-            this.items = [];
-            this.$container = $(opt.container || document.body);
+        /*_preConstruct: function (options) {
+            var opt = {};
+
             this._super(opt);
-        },
+        },*/
 
         //constructor
         init: function(opt) {
-            this.render();
+            //this.render();
         },
 
         addItem: function(item) {
 
-            this.items.push(text);
-            var $li = $("<li>" + text + "</li>");
-            this.$element.append($li);
+            var li = new dMVC.View({htmlTag: 'li', html: item});
+            this.add(li);
 
         },
 
@@ -60,15 +58,8 @@
                 this.items.splice(item, 1);
             }
 
-        },
-
-        render: function() {
-            _.each(this.items, function(item) {
-                var li = $("<li>" + item + "</li>");
-                this.$element.append(li);
-            }, this);
-            this.$container.append(this.$element);
         }
+
 
     });
 

@@ -72,11 +72,39 @@ $(function () {
 
     var app = new AppView({el: '#app_form'});
 
-    var list = new dMVC.Basic.List();
+    //var list = new dMVC.Basic.List({htmlTag: 'ul', container: document.body});
+    var container = new dMVC.View({container: document.body});
+    /*var drop = new dMVC.Vidgets.DropDown({title: 'test title', duration: 'fast'});
+    drop.addHeader('header 1');
+    drop.addItem({text: 'test item 1', click: clicked, context: container, icon: 'heart'});
+    drop.addDivider();
+    drop.addHeader('header 2');
+    drop.addItem({text: 'test item 2', click: clicked, disabled: true});
+    container.add(drop);
+    function clicked() {
+        console.log('test item clicked', this);
+    }*/
+    var group1 = new dMVC.Vidgets.ButtonGroup(/*{justified: true}*/);
+    group1.addItem({title: 'Button 1'});
+    group1.addItem({title: 'Button 2'});
+
+    var drop = new dMVC.Vidgets.DropDown({title: 'test title', duration: 'fast'});
+    drop.addHeader('header 1');
+    drop.addItem({text: 'test item 1'});
+    group1.addItem(drop);
+
+    /*var group2 = new dMVC.Vidgets.ButtonGroup();
+    group2.addItem({title: 'Button 3'});
+    group2.addItem({title: 'Button 4'});
+    var totalGroup = new dMVC.Vidgets.ButtonToolbar();
+    totalGroup.addItem(group1);
+    totalGroup.addItem(group2);*/
+
+    container.add(group1);
 
 
 
-    console.log('app view: ', app);
+    console.log('app view: ', app, group1);
 
     /*var ULView = dMVC.View.subClass({
         type: 'UL'
