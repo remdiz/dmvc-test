@@ -181,4 +181,74 @@
 
     });
 
+    dMVC.Vidgets.Table = dMVC.View.subClass({
+
+        _preConstruct: function (options) {
+            options = options || {};
+            var opt = {};
+            opt.htmlTag = 'table';
+            opt.class = 'table';
+            if(options.striped) {
+                opt.class += ' table-striped';
+            }
+            if(options.bordered) {
+                opt.class += ' table-bordered';
+            }
+            if(options.hover) {
+                opt.class += ' table-hover';
+            }
+            if(options.condensed) {
+                opt.class += ' table-condensed';
+            }
+            //opt.attrs = {'role': 'toolbar', 'aria-label': 'button-toolbar'};
+            this._super(opt);
+            var head = new dMVC.View({
+                htmlTag: 'thead'
+            });
+            var body = new dMVC.View({
+                htmlTag: 'tbody'
+            });
+            this.add(head);
+            this.add(body);
+            this.structure = {
+                thead: head.cid,
+                tbody: body.cid
+            };
+        },
+
+        addRow: function (row) {
+            var tr = new dMVC.View({
+                htmlTag: 'tr',
+                class: row.type || ''
+            });
+            _.each(row.cells, function (cell) {
+                var td = new dMVC.View({
+                    htmlTag: row.head ? 'th' : 'td',
+                    html: cell.content,
+                    class: cell.type || ''
+                });
+                tr.add(td);
+            });
+            var container = row.head ? this.children[this.structure.thead] : this.children[this.structure.tbody];
+            container.add(tr);
+        }
+
+    });
+
+    dMVC.Vidgets.Form = dMVC.View.subClass({
+
+        _preConstruct: function (options) {
+            var opt = {};
+            opt.htmlTag = 'form';
+            /*opt.class = 'btn-toolbar';
+            opt.attrs = {'role': 'toolbar', 'aria-label': 'button-toolbar'};*/
+            this._super(opt);
+        },
+
+        addField: function (field) {
+
+        }
+
+    });
+
 })(this);

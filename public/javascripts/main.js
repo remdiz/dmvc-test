@@ -70,10 +70,47 @@ $(function () {
 
     });
 
-    var app = new AppView({el: '#app_form'});
+    //var app = new AppView({el: '#app_form'});
 
     //var list = new dMVC.Basic.List({htmlTag: 'ul', container: document.body});
-    var container = new dMVC.View({container: document.body});
+
+    var container = new dMVC.View({el: '#tests'});
+    /*var table = new dMVC.Vidgets.Table({hover: true, bordered: true});
+    table.addRow({
+        head: true,
+        cells: [
+            {content: 'id'},
+            {content: 'head 1'},
+            {content: 'head 2'}
+        ]
+    });
+    table.addRow({
+        cells: [
+            {content: '1'},
+            {content: 'test 2'},
+            {content: 'test 3'}
+        ]
+    });
+    table.addRow({
+        type: 'warning',
+        cells: [
+            {content: '2'},
+            {content: 'test 4'},
+            {content: 'test 5'}
+        ]
+    });
+    table.addRow({
+        cells: [
+            {content: '3'},
+            {content: 'test 6'},
+            {content: 'test 7', type: 'danger'}
+        ]
+    });*/
+
+    var form = new dMVC.Vidgets.Form();
+
+    container.add(form);
+
     /*var drop = new dMVC.Vidgets.DropDown({title: 'test title', duration: 'fast'});
     drop.addHeader('header 1');
     drop.addItem({text: 'test item 1', click: clicked, context: container, icon: 'heart'});
@@ -84,14 +121,15 @@ $(function () {
     function clicked() {
         console.log('test item clicked', this);
     }*/
-    var group1 = new dMVC.Vidgets.ButtonGroup(/*{justified: true}*/);
+
+    /*var group1 = new dMVC.Vidgets.ButtonGroup(/!*{justified: true}*!/);
     group1.addItem({title: 'Button 1'});
     group1.addItem({title: 'Button 2'});
 
     var drop = new dMVC.Vidgets.DropDown({title: 'test title', duration: 'fast'});
     drop.addHeader('header 1');
     drop.addItem({text: 'test item 1'});
-    group1.addItem(drop);
+    group1.addItem(drop);*/
 
     /*var group2 = new dMVC.Vidgets.ButtonGroup();
     group2.addItem({title: 'Button 3'});
@@ -100,11 +138,11 @@ $(function () {
     totalGroup.addItem(group1);
     totalGroup.addItem(group2);*/
 
-    container.add(group1);
+    //container.add(group1);
 
 
 
-    console.log('app view: ', app, group1);
+    console.log('app view: ', container);
 
     /*var ULView = dMVC.View.subClass({
         type: 'UL'
