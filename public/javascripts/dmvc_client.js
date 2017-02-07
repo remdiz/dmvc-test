@@ -98,6 +98,8 @@
 
         add: function(item) {
 
+            if(!item)
+                return;
             this.children[item.cid] = item;
             this.$element.append(item.$element);
 
@@ -115,8 +117,25 @@
                 this.$element.remove();
             }
 
-        }
+        },
 
+        find: function(cid) {
+
+            for(var id in this.children) {
+                var child = this.children[id];
+                if(id == cid) {
+                    return child;
+                }
+                if(!_.isEmpty(child.children)) {
+                    var inner =  child.find(cid);
+                    if(inner)
+                        return inner;
+                }
+
+
+            }
+            return null;
+        }
     };
 
     /**
