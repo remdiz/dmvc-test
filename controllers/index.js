@@ -1,6 +1,7 @@
 var _ = require('../public/plugins/underscore');
 
-var dMVC = require('dmvc');
+//var dMVC = require('dmvc');
+var dMVC = require('dmvc-sockets');
 
 dMVC.TaskModel = dMVC.Model.subClass({
 
@@ -91,23 +92,23 @@ dMVC.TaskMapper = dMVC.ModelMapper.subClass({
 
 dMVC.AppController = dMVC.Controller.subClass({
 
-    createTask: function(req, res, next) {
+    createTask: function(socket, msg/*req, res, next*/) {
         var taskController = new dMVC.TaskController();
-        taskController.newTask(req, res, next);
+        taskController.newTask(socket/*req, res, next*/);
 
     },
 
 
-    getTasks: function(req, res, next) {
+    getTasks: function(socket, msg/*req, res, next*/) {
         var taskController = new dMVC.TaskController();
-        taskController.getAll(req, res, next);
+        taskController.getAll(socket/*req, res, next*/);
     }
 
 });
 
 dMVC.TaskController = dMVC.Controller.subClass({
 
-    getAll: function(req, res, next) {
+    getAll: function(socket/*req, res, next*/) {
         var taskMapper = new dMVC.TaskMapper({
             adapter: new dMVC.MongoDBAdapter()
         });
@@ -130,7 +131,7 @@ dMVC.TaskController = dMVC.Controller.subClass({
 
     },
 
-    newTask: function(req, res, next) {
+    newTask: function(socket/*req, res, next*/) {
 
         var task = new dMVC.TaskModel({
             task: req.body.data,

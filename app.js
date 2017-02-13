@@ -43,7 +43,7 @@ io.sockets.on('connection', function (socket) {
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-//var controllers = require('./controllers/index');
+var controllers = require('./controllers/index');
 
 var app = express();
 

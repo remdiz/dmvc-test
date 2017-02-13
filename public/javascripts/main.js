@@ -70,11 +70,11 @@ $(function () {
 
     });
 
-    //var app = new AppView({el: '#app_form'});
+    var app = new AppView({el: '#app_form'});
 
     //var list = new dMVC.Basic.List({htmlTag: 'ul', container: document.body});
 
-    var container = new dMVC.View({el: '#tests'});
+    //var container = new dMVC.View({el: '#tests'});
     /*var table = new dMVC.Vidgets.Table({hover: true, bordered: true});
     table.addRow({
         head: true,
@@ -204,7 +204,7 @@ $(function () {
     navBar.addItem(drop);
     navBar.addForm({inputText: 'Search'});*/
 
-    var list = new dMVC.Vidgets.Breadcrumb();
+    /*var list = new dMVC.Vidgets.Breadcrumb();
     list.addItem({text: 'item 1'}, function() {
         console.log('item 1 clicked');
     });
@@ -213,7 +213,7 @@ $(function () {
 
     container.add(list);
 
-    console.log('view: ', list);
+    console.log('view: ', list);*/
 
     /*var ULView = dMVC.View.subClass({
         type: 'UL'

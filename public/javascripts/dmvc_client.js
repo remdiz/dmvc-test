@@ -73,8 +73,28 @@
      * Client-side events & server commands handler
      * @constructor
      */
-    var EventProcessor = function() {
+    var EventProcessor = function(opt) {
+        opt = opt || {};
+        if(opt.sockets) {
+            var self = this;
+            this._socket = io.connect('http://localhost:3333');
+            this._socket.on('connect', function () {
+                console.log('socket connected: ', this);
+                self._socket.on('message', function (msg) {
 
+                    console.log('socket message: ', msg);
+
+                    _.each(msg, function(item) {
+                        self.trigger(item.command, item);
+                    });
+
+                });
+
+                //self._socket.send('Init message');
+
+            });
+
+        }
     };
     EventProcessor.prototype = {
 
@@ -83,13 +103,15 @@
          * @param opt {Object} to send
          */
         notify: function(opt) {
-            var self = this;
-            $.post('/controllers', opt, function(resp) {
+            //var self = this;
+            this._socket.send(opt);
+
+            /*$.post('/controllers', opt, function(resp) {
                 _.each(resp, function(item) {
                     self.trigger(item.command, item);
                 });
 
-            });
+            });*/
         }
 
     };
@@ -142,7 +164,7 @@
      * Using Backbone.Events
      */
     _.extend(EventProcessor.prototype, Backbone.Events);
-    var processor = new EventProcessor();
+    var processor = new EventProcessor({sockets: true});
 
     /**
      * Main View class
